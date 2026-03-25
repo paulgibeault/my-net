@@ -1,0 +1,65 @@
+---
+# roles/pds/tasks/main.yml
+# Deploy the Bluesky PDS container stack.
+
+- name: Create PDS directory
+  file:
+    path: /opt/pds
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0750"
+
+- name: Template compose.yml
+  template:
+    src: compose.yml.j2
+    dest: /opt/pds/compose.yml
+    owner: "{{ ansible_user }}"
+    mode: "0640"
+
+- name: Template pds.env
+  template:
+    src: pds.env.j2
+    dest: /opt/pds/pds.env
+    owner: "{{ ansible_user }}"
+    mode: "0600"   # secrets — readable only by owner
+
+- name: Template Watchtower compose override
+  template:
+    src: watchtower.yml.j2
+    dest: /opt/pds/watchtower.yml
+    owner: "{{ ansible_user }}"
+    mode: "0640"
+
+- name: Pull PDS image
+  community.docker.docker_image:
+    name: "{{ pds_image }}"
+    source: pull
+
+- name: Start PDS stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/pds
+    files:
+      - compose.yml
+      - watchtower.yml
+    state: present
+    pull: policy
+
+- name: Template PDS health check systemd service
+  template:
+    src: pds-health-check.service.j2
+    dest: /etc/systemd/system/pds-health-check.service
+    mode: "0644"
+
+- name: Template PDS health check systemd timer
+  template:
+    src: pds-health-check.timer.j2
+    dest: /etc/systemd/system/pds-health-check.timer
+    mode: "0644"
+
+- name: Enable PDS health check timer
+  systemd:
+    name: pds-health-check.timer
+    state: started
+    enabled: true
+    daemon_reload: true

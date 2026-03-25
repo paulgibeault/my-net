@@ -1,0 +1,26 @@
+---
+# ansible/playbooks/deploy-monitoring.yml
+# Deploy Prometheus + Grafana + Node Exporter monitoring stack.
+
+- name: Deploy monitoring stack
+  hosts: monitoring
+  become: true
+
+  roles:
+    - role: base
+    - role: monitoring
+
+  post_tasks:
+    - name: Verify Grafana is up
+      uri:
+        url: "http://localhost:3000/api/health"
+        status_code: 200
+        timeout: 30
+      register: grafana_health
+      retries: 5
+      delay: 10
+      until: grafana_health.status == 200
+
+    - name: Grafana is healthy
+      debug:
+        msg: "✅ Grafana is running. Access via Tailscale: http://{{ ansible_host }}:3000"

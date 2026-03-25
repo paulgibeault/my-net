@@ -1,0 +1,7 @@
+[Unit]
+Description=PDS Health Check — restart on failure
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/pds-health-check.sh

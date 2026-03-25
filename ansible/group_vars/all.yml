@@ -1,0 +1,26 @@
+---
+# ansible/group_vars/all.yml
+# Shared variables across all hosts.
+# Override per-host in inventory/hosts.yml or host_vars/.
+
+# PDS container image
+pds_image: ghcr.io/bluesky-social/pds:latest
+
+# Domain for handle registration (e.g. users get handle.your-community.com)
+pds_handle_domain: "{{ pds_domain }}"
+
+# MinIO endpoint (on your NAS via Tailscale)
+minio_endpoint: "http://nas-01.tailnet.ts.net:9000"
+minio_bucket: pds-blobs
+
+# Litestream replication target (MinIO S3-compatible)
+litestream_replica_url: "s3://{{ minio_bucket }}/litestream"
+litestream_endpoint: "{{ minio_endpoint }}"
+
+# Monitoring
+prometheus_retention: 30d
+grafana_admin_user: admin
+
+# Watchtower (auto-update PDS image)
+watchtower_schedule: "0 0 4 * * *"   # 4am daily
+watchtower_cleanup: true

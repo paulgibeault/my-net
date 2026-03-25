@@ -1,0 +1,32 @@
+---
+# ansible/inventory/hosts.example.yml
+# Copy to hosts.yml and fill in your values.
+# Use Tailscale hostnames (preferred) or LAN IPs.
+
+all:
+  vars:
+    ansible_user: steve
+    ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+  children:
+    pds_nodes:
+      hosts:
+        pds-primary:
+          ansible_host: pds-primary.tailnet.ts.net  # or 192.168.1.x
+          pds_domain: your-community.example.com
+          pds_admin_email: admin@your-community.example.com
+
+        pds-replica:
+          ansible_host: pds-replica.tailnet.ts.net
+          pds_domain: node2.your-community.example.com
+          pds_admin_email: admin@your-community.example.com
+
+    monitoring:
+      hosts:
+        monitor-01:
+          ansible_host: monitor-01.tailnet.ts.net
+
+    storage:
+      hosts:
+        nas-01:
+          ansible_host: nas-01.tailnet.ts.net

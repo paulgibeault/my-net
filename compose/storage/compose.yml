@@ -1,0 +1,41 @@
+---
+# compose/storage/compose.yml
+# MinIO S3-compatible blob storage — runs on NAS via Docker.
+# Accessible only via Tailscale.
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_VOLUMES=/data
+    volumes:
+      - /mnt/nas/minio:/data   # point at your NAS mount
+    ports:
+      - "100.x.x.x:9000:9000"    # S3 API — Tailscale only
+      - "100.x.x.x:9001:9001"    # MinIO console — Tailscale only
+
+  # mc createbucket runs once to ensure buckets exist
+  minio-init:
+    image: minio/mc:latest
+    container_name: minio-init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5;
+        mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+        mc mb --ignore-existing local/pds-blobs;
+        mc mb --ignore-existing local/pds-backups;
+        mc anonymous set none local/pds-blobs;
+        echo 'Buckets ready.';
+        exit 0;
+      "
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    restart: "no"

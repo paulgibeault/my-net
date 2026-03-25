@@ -1,0 +1,14 @@
+[Unit]
+Description=Litestream — real-time SQLite replication
+After=network.target pds.service
+BindsTo=pds.service
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/litestream replicate -config /etc/litestream/litestream.yml
+ExecStop=/usr/local/bin/litestream replicate -config /etc/litestream/litestream.yml --stop
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

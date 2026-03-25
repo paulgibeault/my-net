@@ -1,0 +1,20 @@
+# Secrets — never commit these
+*.env
+*.key
+*.pem
+secrets/
+vault/
+.vault-token
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Ansible
+*.retry
+.ansible/
+
+# Editor
+.vscode/
+.idea/
+*.swp

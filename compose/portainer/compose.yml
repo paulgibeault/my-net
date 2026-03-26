@@ -1,0 +1,36 @@
+# Portainer CE — visual Docker management dashboard
+#
+# ⚠ PRIVATE ACCESS ONLY — do NOT expose via Cloudflare tunnel
+# Access via Tailscale mesh only: https://<tailscale-hostname>:9443
+#
+# Portainer gives you a visual dashboard for managing your server's
+# containers, volumes, and images. Think of it as a web-based GUI
+# for everything Docker — accessible only from your private network.
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    # Port 9443 is HTTPS — only binds to Tailscale interface (see networks)
+    # Do NOT add this to Cloudflare tunnel routes
+    ports:
+      - "9443:9443"
+    volumes:
+      - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # Tailscale-only: bind to the tailscale0 interface address via firewall rules
+    # (ufw/iptables rules applied by Ansible — see roles/tailscale/tasks/main.yml)
+    labels:
+      - "my-net.access=tailscale-only"
+      - "my-net.service=portainer"
+      - "my-net.description=Visual Docker management dashboard — private network only"
+
+volumes:
+  portainer_data:
+    driver: local
+
+networks:
+  default:
+    name: my-net-internal
+    external: true

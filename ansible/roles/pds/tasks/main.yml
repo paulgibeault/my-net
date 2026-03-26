@@ -45,6 +45,12 @@
     state: present
     pull: policy
 
+- name: Deploy PDS health check script
+  template:
+    src: pds-health-check.sh.j2
+    dest: /usr/local/bin/pds-health-check.sh
+    mode: "0755"
+
 - name: Template PDS health check systemd service
   template:
     src: pds-health-check.service.j2

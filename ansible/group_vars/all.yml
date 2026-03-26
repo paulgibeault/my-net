@@ -1,26 +1,91 @@
 ---
 # ansible/group_vars/all.yml
-# Shared variables across all hosts.
-# Override per-host in inventory/hosts.yml or host_vars/.
+# Default variables for all hosts.
+# Override per-host in inventory/hosts.yml or host_vars/<hostname>.yml.
+#
+# SECRETS: Variables prefixed with vault_ are loaded from an encrypted vault file.
+# Run: ansible-vault create group_vars/vault.yml  (copy vault.example.yml as template)
 
-# PDS container image
+
+# ─── PDS ──────────────────────────────────────────────────────────────────────
+
+# Container image for the Bluesky PDS
 pds_image: ghcr.io/bluesky-social/pds:latest
 
-# Domain for handle registration (e.g. users get handle.your-community.com)
+# Public hostname for this PDS (e.g. pds.yourfamily.net)
+# Required — override in hosts.yml per host
+pds_domain: ""
+
+# Domain suffix for user handles (e.g. .yourfamily.net → user.yourfamily.net)
+# Defaults to pds_domain — override if using a separate handle domain
 pds_handle_domain: "{{ pds_domain }}"
 
-# MinIO endpoint (on your NAS via Tailscale)
+# Secrets — values come from vault (see group_vars/vault.yml)
+pds_jwt_secret: "{{ vault_pds_jwt_secret }}"
+pds_admin_password: "{{ vault_pds_admin_password }}"
+pds_plc_rotation_key: "{{ vault_pds_plc_rotation_key }}"
+
+
+# ─── MinIO (S3-compatible blob + Litestream storage) ──────────────────────────
+
+# MinIO server endpoint — typically your NAS on the Tailscale network
 minio_endpoint: "http://nas-01.tailnet.ts.net:9000"
+
+# Bucket name for PDS blob storage
 minio_bucket: pds-blobs
 
-# Litestream replication target (MinIO S3-compatible)
+# Secrets — values come from vault
+minio_access_key: "{{ vault_minio_access_key }}"
+minio_secret_key: "{{ vault_minio_secret_key }}"
+
+
+# ─── Litestream ───────────────────────────────────────────────────────────────
+
+# Derived from MinIO settings — no need to override separately
 litestream_replica_url: "s3://{{ minio_bucket }}/litestream"
 litestream_endpoint: "{{ minio_endpoint }}"
 
-# Monitoring
+
+# ─── Cloudflare Tunnel ────────────────────────────────────────────────────────
+
+# Tunnel token from Cloudflare Zero Trust dashboard
+# Secret — value comes from vault
+cloudflare_tunnel_token: "{{ vault_cloudflare_tunnel_token }}"
+
+
+# ─── Tailscale ────────────────────────────────────────────────────────────────
+
+# Auth key from Tailscale admin console (use reusable, pre-approved keys)
+# Secret — value comes from vault
+tailscale_auth_key: "{{ vault_tailscale_auth_key }}"
+
+
+# ─── Email (SMTP) ─────────────────────────────────────────────────────────────
+
+# SMTP server for PDS invite/2FA emails
+smtp_host: smtp.example.com
+smtp_user: "{{ vault_smtp_user }}"
+smtp_password: "{{ vault_smtp_password }}"
+
+
+# ─── Watchtower (auto-update) ─────────────────────────────────────────────────
+
+# Cron schedule for image update checks (used if switching to cron mode)
+watchtower_schedule: "0 0 4 * * *"   # 4am daily
+# Remove old images after pulling new ones
+watchtower_cleanup: true
+
+
+# ─── Monitoring ───────────────────────────────────────────────────────────────
+
 prometheus_retention: 30d
 grafana_admin_user: admin
 
-# Watchtower (auto-update PDS image)
-watchtower_schedule: "0 0 4 * * *"   # 4am daily
-watchtower_cleanup: true
+
+# ─── Deployment profile ───────────────────────────────────────────────────────
+
+# Controls environment-specific behaviour (cloud | local | hybrid)
+# cloud  = Hostinger VPS + Cloudflare Tunnel + MinIO on NAS
+# local  = bare-metal or Pi on LAN
+# hybrid = cloud ingress, local storage
+deployment_profile: cloud

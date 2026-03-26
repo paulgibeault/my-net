@@ -1,0 +1,16 @@
+---
+# roles/gatekeeper/tasks/main.yml
+# PDS Gatekeeper — 2FA / auth proxy in front of the PDS admin endpoints.
+#
+# STATUS: Phase 0 stub — not yet implemented.
+# This role is a placeholder so the playbook runs end-to-end.
+# See: https://github.com/paulgibeault/my-net/issues (Phase 1)
+
+- name: Gatekeeper — stub (Phase 0)
+  debug:
+    msg: >-
+      ⏭️  Gatekeeper role skipped — Phase 0 stub.
+      A 2FA/auth proxy for PDS admin endpoints is planned for Phase 1.
+      The PDS admin interface is currently protected only by the admin password
+      and Tailscale network segmentation. Ensure Tailscale is running and
+      your Tailscale ACL restricts access appropriately.

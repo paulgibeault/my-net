@@ -1,0 +1,62 @@
+---
+# roles/base/tasks/tailscale.yml
+# Install Tailscale via the official install script and join the tailnet.
+# Must run BEFORE UFW is enabled (Tailscale creates the tailscale0 interface
+# that UFW rules reference).
+
+- name: Check if Tailscale is already installed
+  command: tailscale version
+  register: tailscale_check
+  changed_when: false
+  failed_when: false
+
+- name: Download and run Tailscale install script
+  shell: |
+    curl -fsSL https://tailscale.com/install.sh | sh
+  args:
+    creates: /usr/bin/tailscale
+  when: tailscale_check.rc != 0
+
+- name: Enable and start tailscaled
+  systemd:
+    name: tailscaled
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Check if already connected to tailnet
+  command: tailscale status --json
+  register: tailscale_status
+  changed_when: false
+  failed_when: false
+
+- name: Set tailscale_connected fact
+  set_fact:
+    tailscale_connected: >-
+      {{
+        (tailscale_status.stdout | from_json).BackendState == 'Running'
+        if tailscale_status.rc == 0 and tailscale_status.stdout != ''
+        else false
+      }}
+
+- name: Join tailnet
+  command: >
+    tailscale up
+    --authkey={{ tailscale_auth_key }}
+    --hostname={{ inventory_hostname }}
+    --advertise-tags=tag:pds-node
+    --ssh
+  when: not tailscale_connected
+  no_log: true   # auth key is a secret
+
+- name: Confirm Tailscale is connected
+  command: tailscale status
+  register: ts_final_status
+  changed_when: false
+  retries: 5
+  delay: 5
+  until: ts_final_status.rc == 0
+
+- name: Show Tailscale status
+  debug:
+    msg: "{{ ts_final_status.stdout_lines }}"

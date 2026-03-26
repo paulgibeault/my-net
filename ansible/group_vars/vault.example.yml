@@ -1,0 +1,60 @@
+---
+# ansible/group_vars/vault.example.yml
+# Example ansible-vault secrets file.
+#
+# SETUP:
+#   1. Copy this file to group_vars/vault.yml
+#   2. Replace all placeholder values with real secrets
+#   3. Encrypt it: ansible-vault encrypt group_vars/vault.yml
+#   4. NEVER commit group_vars/vault.yml — it's in .gitignore
+#
+# To edit later: ansible-vault edit group_vars/vault.yml
+# To view:       ansible-vault view group_vars/vault.yml
+
+
+# ─── PDS secrets ──────────────────────────────────────────────────────────────
+
+# Random 32-byte hex string — JWT signing key
+# Generate: openssl rand -hex 32
+vault_pds_jwt_secret: "REPLACE_WITH_openssl_rand_hex_32"
+
+# Strong password for PDS admin account
+# Used to authenticate the admin API (/xrpc/com.atproto.server.*)
+vault_pds_admin_password: "REPLACE_WITH_strong_random_password"
+
+# PLC rotation key — secp256k1 private key in hex
+# Generate: openssl ecparam -name secp256k1 -genkey -noout | openssl ec -text -noout 2>/dev/null | grep priv -A 3 | tail -3 | tr -d ' \n:'
+# ⚠️  Store a backup offline (cold storage). Losing this = losing DID control.
+vault_pds_plc_rotation_key: "REPLACE_WITH_secp256k1_private_key_hex"
+
+
+# ─── MinIO credentials ────────────────────────────────────────────────────────
+
+# Access key ID for MinIO (like an AWS access key)
+vault_minio_access_key: "REPLACE_WITH_minio_access_key"
+
+# Secret access key for MinIO
+vault_minio_secret_key: "REPLACE_WITH_minio_secret_key"
+
+
+# ─── Cloudflare Tunnel ────────────────────────────────────────────────────────
+
+# Tunnel token from Cloudflare Zero Trust > Networks > Tunnels
+# Click your tunnel > Configure > Run the connector > copy the token from the docker command
+vault_cloudflare_tunnel_token: "REPLACE_WITH_cloudflare_tunnel_token"
+
+
+# ─── Tailscale ────────────────────────────────────────────────────────────────
+
+# Auth key from Tailscale admin console (Settings > Keys > Generate auth key)
+# Use a "reusable" pre-approved key tagged with tag:pds-node for automated provisioning
+vault_tailscale_auth_key: "tskey-auth-REPLACE_WITH_tailscale_auth_key"
+
+
+# ─── SMTP credentials ─────────────────────────────────────────────────────────
+
+# SMTP username (usually your email address)
+vault_smtp_user: "noreply@example.com"
+
+# SMTP password or app password
+vault_smtp_password: "REPLACE_WITH_smtp_password"

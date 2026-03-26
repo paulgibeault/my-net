@@ -21,6 +21,12 @@
       - jq
     state: present
 
+# ─── Tailscale ────────────────────────────────────────────────────────────────
+# Must run BEFORE UFW — UFW rules reference tailscale0, which Tailscale creates.
+
+- name: Install and join Tailscale
+  import_tasks: tailscale.yml
+
 # ─── UFW ──────────────────────────────────────────────────────────────────────
 # Block everything by default. Only allow SSH on the Tailscale interface.
 # Cloudflare Tunnel handles all public traffic — no inbound ports needed.

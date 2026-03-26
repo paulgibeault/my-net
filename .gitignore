@@ -13,6 +13,11 @@ Thumbs.db
 # Ansible
 *.retry
 .ansible/
+# Encrypted vault — never commit the real vault (commit vault.example.yml only)
+ansible/group_vars/vault.yml
+ansible/host_vars/**/vault.yml
+# Real inventory — commit hosts.example.yml only
+ansible/inventory/hosts.yml
 
 # Editor
 .vscode/

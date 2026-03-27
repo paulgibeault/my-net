@@ -9,6 +9,13 @@ Or via:  bash install.sh (which runs this automatically)
 from __future__ import annotations
 
 import sys
+from pathlib import Path
+
+# Ensure the wizard's parent directory is on sys.path so `from wizard import ...` works
+# regardless of the working directory the script is launched from.
+_repo_root = Path(__file__).resolve().parent.parent
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
 
 # Python version guard (friendly message before any imports that might fail)
 if sys.version_info < (3, 10):

@@ -196,4 +196,4 @@ echo ""
 echo -e "${BOLD}${GREEN}Everything is ready! Starting the wizard...${RESET}"
 echo ""
 
-exec "$PY_CMD" "$MYNET_DIR/wizard/main.py" "$@"
+cd "$MYNET_DIR" && exec "$PY_CMD" "wizard/main.py" "$@"

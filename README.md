@@ -35,27 +35,26 @@ Private Mesh (Tailscale / WireGuard)
 ## Repository Structure
 
 ```
-atproto-infra/
+my-net/
 ├── ansible/                  # Automation playbooks
-│   ├── inventory/            # Host definitions
+│   ├── inventory/            # Host definitions (hosts.example.yml)
 │   ├── playbooks/            # Provisioning playbooks
-│   ├── roles/                # Reusable roles
-│   └── group_vars/           # Shared variables
+│   ├── roles/                # Reusable roles (base, pds, gatekeeper, litestream)
+│   └── group_vars/           # Shared variables + vault template
 ├── compose/                  # Docker Compose stacks
-│   ├── pds/                  # PDS + gatekeeper
 │   ├── monitoring/           # Prometheus + Grafana
-│   └── storage/              # MinIO
-├── config/                   # Config templates (no secrets)
-│   ├── nginx/
-│   ├── caddy/
-│   └── litestream/
+│   ├── portainer/            # Portainer management UI
+│   └── storage/              # MinIO blob storage
 ├── docs/                     # Architecture docs, runbooks
 │   ├── architecture.md
 │   ├── onboarding.md
 │   ├── hardware.md
 │   ├── disaster-recovery.md
+│   ├── phase0-smoke-test.md
 │   └── security.md
 ├── scripts/                  # Utility scripts
+├── wizard/                   # Interactive setup wizard (Python)
+├── install.sh                # Bootstrap installer
 └── REQUIREMENTS.md           # Full requirements spec
 ```
 
@@ -67,8 +66,8 @@ atproto-infra/
 
 ```bash
 # 1. Clone this repo onto your management machine
-git clone <this-repo> atproto-infra
-cd atproto-infra
+git clone https://github.com/paulgibeault/my-net.git my-net
+cd my-net
 
 # 2. Copy and fill in your inventory
 cp ansible/inventory/hosts.example.yml ansible/inventory/hosts.yml
@@ -102,8 +101,9 @@ curl https://your-pds-domain.com/xrpc/_health
 | Ansible skeleton | ✅ Scaffolded |
 | Compose stacks | ✅ Scaffolded |
 | Litestream config | ✅ Templated |
+| Setup wizard | ✅ Scaffolded |
 | Docs | 🔄 In progress |
-| GitHub repo | ⏳ Awaiting link from Paul |
+| Phase 0 smoke test | 📋 Documented |
 
 ---
 

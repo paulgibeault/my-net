@@ -63,7 +63,7 @@ jobs:
         run: pip install ansible-lint
 
       - name: Install required Ansible collections
-        run: ansible-galaxy collection install community.general
+        run: ansible-galaxy collection install community.general community.docker
 
       - name: Lint playbooks
         run: ansible-lint ansible/playbooks/ --profile min

@@ -1,0 +1,10 @@
+---
+# ansible/roles/monitoring/tasks/main.yml
+# Deploy Prometheus + Grafana + Node Exporter monitoring stack.
+# Placeholder — full implementation in a future task.
+
+- name: Ensure monitoring compose directory exists
+  ansible.builtin.file:
+    path: /opt/monitoring
+    state: directory
+    mode: '0755'

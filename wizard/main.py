@@ -28,7 +28,6 @@ import signal  # noqa: E402
 import questionary  # noqa: E402
 from rich.console import Console  # noqa: E402
 from rich.panel import Panel  # noqa: E402
-from rich import print as rprint  # noqa: E402
 
 from wizard import state as wstate  # noqa: E402
 

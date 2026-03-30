@@ -1,0 +1,7 @@
+[lint]
+# E402: module-level imports not at top of file
+# wizard/main.py intentionally sets sys.path before importing to support
+# running from any working directory. Step modules use lazy imports similarly.
+[lint.per-file-ignores]
+"wizard/*.py" = ["E402"]
+"wizard/**/*.py" = ["E402"]

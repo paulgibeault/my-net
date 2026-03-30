@@ -1,0 +1,6 @@
+---
+galaxy_info:
+  role_name: monitoring
+  description: Deploy Prometheus + Grafana + Node Exporter monitoring stack
+  min_ansible_version: "2.14"
+dependencies: []

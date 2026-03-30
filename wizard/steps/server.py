@@ -9,11 +9,9 @@ from __future__ import annotations
 import questionary
 from rich.console import Console
 from rich.panel import Panel
-from rich.spinner import Spinner
 from rich import print as rprint
 
 from wizard import state as wstate
-from wizard.diagrams.ascii import architecture
 from wizard.validators.ssh import test_ssh_connection
 
 console = Console()

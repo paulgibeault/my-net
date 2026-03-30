@@ -99,8 +99,6 @@ success "OS detected: $OS"
 
 # ── Python version check ──────────────────────────────────────────────────────
 check_python() {
-    local py_cmd=""
-
     for cmd in python3 python3.12 python3.11 python3.10 python; do
         if command -v "$cmd" &>/dev/null; then
             local version

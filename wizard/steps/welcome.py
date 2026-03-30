@@ -116,7 +116,7 @@ def run(wizard_state: dict) -> dict:
     wizard_state["deployment_profile"] = profile
     wstate.mark_step_complete(wizard_state, STEP_NAME)
 
-    console.print(f"[green]✓ Great! We'll set you up on a [bold]Hostinger VPS[/bold].[/green]")
+    console.print("[green]✓ Great! We'll set you up on a [bold]Hostinger VPS[/bold].[/green]")
     console.print()
 
     return wizard_state

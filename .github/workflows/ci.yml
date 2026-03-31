@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ── Python wizard lint + import check ──────────────────────────────
+  wizard:
+    name: Wizard (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: wizard/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r wizard/requirements.txt
+
+      - name: Lint (ruff)
+        run: |
+          pip install ruff
+          ruff check wizard/
+
+      - name: Import check (all modules importable)
+        run: |
+          python -c "
+          import importlib, pathlib, sys
+          sys.path.insert(0, '.')
+          errors = []
+          for f in pathlib.Path('wizard').rglob('*.py'):
+              mod = str(f).replace('/', '.').removesuffix('.py')
+              try:
+                  importlib.import_module(mod)
+              except Exception as e:
+                  errors.append(f'{mod}: {e}')
+          if errors:
+              print('Import errors:\\n' + '\\n'.join(errors))
+              sys.exit(1)
+          print('All wizard modules import OK')
+          "
+
+  # ── Ansible YAML lint ───────────────────────────────────────────────
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ansible-lint
+        run: pip install ansible-lint
+
+      - name: Install required Ansible collections
+        run: ansible-galaxy collection install community.general community.docker
+
+      - name: Lint playbooks
+        run: ansible-lint ansible/playbooks/ --profile min
+
+      - name: Lint roles
+        run: ansible-lint ansible/roles/ --profile min
+
+  # ── install.sh shell check ──────────────────────────────────────────
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: "."
+          severity: warning

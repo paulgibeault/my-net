@@ -23,14 +23,13 @@ if sys.version_info < (3, 10):
     print("   Please upgrade Python and re-run install.sh\n")
     sys.exit(1)
 
-import signal
+import signal  # noqa: E402
 
-import questionary
-from rich.console import Console
-from rich.panel import Panel
-from rich import print as rprint
+import questionary  # noqa: E402
+from rich.console import Console  # noqa: E402
+from rich.panel import Panel  # noqa: E402
 
-from wizard import state as wstate
+from wizard import state as wstate  # noqa: E402
 
 console = Console()
 

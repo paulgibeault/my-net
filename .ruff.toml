@@ -1,0 +1,4 @@
+[lint]
+# E402: module-level imports not at top of file
+# The wizard uses a sys.path bootstrap pattern that requires imports after path setup.
+ignore = ["E402"]

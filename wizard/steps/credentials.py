@@ -9,7 +9,6 @@ an ansible-vault encrypted file.
 from __future__ import annotations
 
 import secrets
-import string
 
 import questionary
 from rich.console import Console
